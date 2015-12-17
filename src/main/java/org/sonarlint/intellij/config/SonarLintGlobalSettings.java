@@ -19,6 +19,13 @@
  */
 package org.sonarlint.intellij.config;
 
+import java.io.File;
+
+import org.jetbrains.annotations.NonNls;
+import org.jetbrains.annotations.NotNull;
+
+import org.sonarlint.intellij.util.SonarLintBundle;
+
 import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.application.PathManager;
 import com.intellij.openapi.components.ExportableApplicationComponent;
@@ -26,66 +33,55 @@ import com.intellij.openapi.components.PersistentStateComponent;
 import com.intellij.openapi.components.State;
 import com.intellij.openapi.components.Storage;
 import com.intellij.openapi.components.StoragePathMacros;
+
 import com.intellij.util.xmlb.XmlSerializerUtil;
-import org.jetbrains.annotations.NonNls;
-import org.jetbrains.annotations.NotNull;
-import org.sonarlint.intellij.util.SonarLintBundle;
 
-import java.io.File;
-
-@State(name = "SonarLintGlobalSettings", storages = {@Storage(id = "sonarlint", file = StoragePathMacros.APP_CONFIG + "/sonarlint.xml")})
+@State(name = "SonarLintGlobalSettings", storages = { @Storage(id = "sonarlint", file = StoragePathMacros.APP_CONFIG + "/sonarlint.xml") })
 public final class SonarLintGlobalSettings implements PersistentStateComponent<SonarLintGlobalSettings>, ExportableApplicationComponent {
+    public static SonarLintGlobalSettings getInstance() {
+        return ApplicationManager.getApplication().getComponent(SonarLintGlobalSettings.class);
+    }
 
-  private String serverUrl = "https://update.sonarlint.org";
+    @Override
+    public SonarLintGlobalSettings getState() {
+        return this;
+    }
 
-  public static SonarLintGlobalSettings getInstance() {
-    return ApplicationManager.getApplication().getComponent(SonarLintGlobalSettings.class);
-  }
+    @Override
+    public void loadState(SonarLintGlobalSettings state) {
+        XmlSerializerUtil.copyBean(state, this);
+    }
 
-  @Override
-  public SonarLintGlobalSettings getState() {
-    return this;
-  }
+    @Override
+    @NotNull
+    public File[] getExportFiles() {
+        return new File[] { PathManager.getOptionsFile("sonarlint") };
+    }
 
-  @Override
-  public void loadState(SonarLintGlobalSettings state) {
-    XmlSerializerUtil.copyBean(state, this);
-  }
+    @Override
+    @NotNull
+    public String getPresentableName() {
+        return SonarLintBundle.message("sonarlint.settings");
+    }
 
-  @Override
-  @NotNull
-  public File[] getExportFiles() {
-    return new File[] {PathManager.getOptionsFile("sonarlint")};
-  }
+    @Override
+    @NotNull
+    @NonNls
+    public String getComponentName() {
+        return "SonarLintGlobalSettings";
+    }
 
-  @Override
-  @NotNull
-  public String getPresentableName() {
-    return SonarLintBundle.message("sonarlint.settings");
-  }
+    @Override
+    public void initComponent() {
+        // Nothing to do
+    }
 
-  @Override
-  @NotNull
-  @NonNls
-  public String getComponentName() {
-    return "SonarLintGlobalSettings";
-  }
+    @Override
+    public void disposeComponent() {
+        // Nothing to do
+    }
 
-  @Override
-  public void initComponent() {
-    // Nothing to do
-  }
-
-  @Override
-  public void disposeComponent() {
-    // Nothing to do
-  }
-
-  public String getServerUrl() {
-    return serverUrl;
-  }
-
-  public void setServerUrl(String serverUrl) {
-    this.serverUrl = serverUrl;
-  }
+    public String getServerUrl() {
+        return SonarLintBundle.message("sonarlint.serverUrl");
+    }
 }
